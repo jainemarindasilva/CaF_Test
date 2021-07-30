@@ -1,15 +1,14 @@
+import { Response } from 'express';
 import { ICompany } from '../interfaces/CompanyInterface'
-import Company from '../schemas/Company'
+import Company from '../models/CompanyModel'
 
 class CompanyService {
 
-    public create (company: ICompany): void {
-        Company.create(
-        [{
-            cnpj: company.cnpj,
-            razao_social: company.razao_social,
-            uf: company.uf
-        }])
+    public findAndUpdate (cnpjPar: String, company: ICompany): void {
+        const query = { cnpj: cnpjPar }
+        const update = { $set: company }
+        const options = { upsert: true, useFindAndModify: false }
+        Company.findOneAndUpdate(query, update, options)
     }
 
     public async find (cnpj: String): Promise<ICompany> {

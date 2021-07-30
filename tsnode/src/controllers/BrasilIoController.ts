@@ -1,49 +1,38 @@
-import axios, { AxiosRequestConfig } from 'axios'
-import * as https from 'https'
+import { BrasilIoService } from './../services/BrasilIoService';
 import { ICompany } from '../interfaces/CompanyInterface'
-import Company from '../schemas/Company'
-import { IBusinessPartner } from './../interfaces/BusinessPartnerInterface';
-import BusinessPartner from '../schemas/BusinessPartner'
-
-type Urls = {
-    company: string;
-    businessPartner: string;
-};
+import { IPartner } from '../interfaces/PartnerInterface'
+import Company from '../models/CompanyModel'
 
 export class BrasilIoController {
 
-    private basesUrl: string;
-    private urls: Urls;
-    private author: {};
+    public async getCompany (cnpj:String): Promise<ICompany>{
 
-    constructor(){
-        this.basesUrl = 'http://api.brasil.io/v1/dataset/socios-brasil/'
-        this.urls = {
-            company: 'empresas/data/',
-            businessPartner: 'socios/data/'
-        }
-        this.author = {'Authorization': 'Token 425e9a6166866bd68b26cdcca00372b3b5fce2f8'}
-    }
+        const brasilIoService = new BrasilIoService()
+        let company:ICompany  
+        let companyResponse: ICompany     
+        let partners: IPartner[] = []
+        let partnersResponse: IPartner[] = []
 
-    public async getCompany (cnpj: String): Promise<ICompany> {
-        const { data } = await axios(this.getConfig(cnpj, this.urls.company))
-        let company: ICompany = new Company(data.results[0])
+        companyResponse = new Company(await brasilIoService.getCompany(cnpj))
+        partnersResponse = await brasilIoService.getPartners(cnpj)
+        
+        partnersResponse.forEach(partner => {
+            partners.push({
+                cpf_cnpj_socio: partner.cpf_cnpj_socio,
+                nome_socio: partner.nome_socio,
+                qualificacao_socio: partner.qualificacao_socio,
+                tipo_socio: partner.tipo_socio
+            })
+        })
+
+        company = new Company({
+            cnpj: companyResponse.cnpj,
+            razao_social: companyResponse.razao_social,
+            uf: companyResponse.uf,
+            qsa: []
+        })
+        company.qsa = partners
+        
         return company
-    }
-
-    public async getBusinessPartners (cnpj: String): Promise<IBusinessPartner[]> {
-        const { data } = await axios(this.getConfig(cnpj, this.urls.businessPartner))
-        let businessPartners: IBusinessPartner[] = (data.results)
-        return businessPartners
-    }
-
-    private getConfig (cnpj: String, urlType: String): AxiosRequestConfig {
-        return {
-            method: 'get',
-            url: this.basesUrl + urlType, 
-            headers: this.author,
-            params: { cnpj: cnpj },
-            httpsAgent: new https.Agent({ rejectUnauthorized: false })
-        }    
     }
 }

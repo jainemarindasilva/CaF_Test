@@ -1,9 +1,7 @@
 import {Request, Response} from 'express'
-import CompanyService from '../services/CompanyService'
-import BusinessPartnerService from '../services/BusinessPartnerService'
 import { BrasilIoController } from './BrasilIoController'
 import { ICompany } from '../interfaces/CompanyInterface'
-import { IBusinessPartner } from './../interfaces/BusinessPartnerInterface';
+import CompanyService from '../services/CompanyService'
 
 interface BusinessPartnerData {
     cpf_cnpj_socio: String,
@@ -18,85 +16,29 @@ interface CompanyData {
     qsa:BusinessPartnerData[]
 }
 
-class CompanyController {
+class CompanyController {  
 
     public async getCompany (req:Request, res:Response): Promise<CompanyData> {
         const cnpj: String = req.query.cnpj.toString()
+        const consulta: String = req.query.consulta.toString()
+        const brasilIoController = new BrasilIoController()
         let company:ICompany
-        let businessPartners:IBusinessPartner[]
-        let businessPartnersData:BusinessPartnerData[] = []
-        let newBusinessPartner:BusinessPartnerData
 
-        company = await CompanyService.find(cnpj)
+        if (consulta == 'cacheado') {
+            company = await CompanyService.find(cnpj) 
 
-        if (company.cnpj != undefined) {
-            businessPartners = await BusinessPartnerService.find(cnpj)
-
-            businessPartners.forEach ( businessPartner => {
-                newBusinessPartner = {
-                    cpf_cnpj_socio: businessPartner.cpf_cnpj_socio,
-                    nome_socio: businessPartner.nome_socio,
-                    qualificacao_socio: businessPartner.qualificacao_socio,
-                    tipo_socio: businessPartner.tipo_socio
-                }
-                businessPartnersData.push(newBusinessPartner)
-            })
+            if (company.cnpj == undefined) {
+                company = await brasilIoController.getCompany(cnpj)
+                CompanyService.findAndUpdate(cnpj,company)
+            }            
         }
         else {
-            const brasilIoController = new BrasilIoController()
-
-            brasilIoController.getCompany(cnpj).then( companyAux => {
-                company = companyAux
-                CompanyService.create(company)                
-            })
-
-            brasilIoController.getBusinessPartners(cnpj).then( businessPartnersAux => {
-                businessPartnersAux.forEach( businessPartnerAux => {
-                    BusinessPartnerService.create(businessPartnerAux)
-                })
-
-                businessPartnersAux.forEach ( businessPartner => {
-                    newBusinessPartner = {
-                        cpf_cnpj_socio: businessPartner.cpf_cnpj_socio,
-                        nome_socio: businessPartner.nome_socio,
-                        qualificacao_socio: businessPartner.qualificacao_socio,
-                        tipo_socio: businessPartner.tipo_socio
-                    }
-                    businessPartnersData.push(newBusinessPartner)
-                })
-            })
+            company = await brasilIoController.getCompany(cnpj)
+            CompanyService.findAndUpdate(cnpj,company)
         }
 
-        let companyData:CompanyData = {
-            cnpj: company.cnpj,
-            razao_social: company.razao_social,
-            uf: company.uf,
-            qsa: businessPartnersData
-        }
-
-        res.send(companyData)
-
-        return companyData
-    }
-
-    private async findCompany (cnpj: String): Promise<ICompany> {
-        const brasilIoController = new BrasilIoController()
-        return await brasilIoController.getCompany(cnpj)
-    }
-
-    private async findBusinessPartner (cnpj: String): Promise<IBusinessPartner[]> {
-        const brasilIoController = new BrasilIoController()
-        return await brasilIoController.getBusinessPartners(cnpj)
-    }
-
-    public createCompany(company:ICompany) {
-        CompanyService.create(company)    
-    }
-    
-    public createBusinessPartner(businessPartners:IBusinessPartner[]) {
-        businessPartners.forEach(businessPartner => {
-            BusinessPartnerService.create(businessPartner)
-        })
+        res.send(company)
+        return company
     }
 }
 
