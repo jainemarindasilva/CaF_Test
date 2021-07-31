@@ -3,42 +3,46 @@ import { BrasilIoController } from './BrasilIoController'
 import { ICompany } from '../interfaces/CompanyInterface'
 import CompanyService from '../services/CompanyService'
 
-interface BusinessPartnerData {
-    cpf_cnpj_socio: String,
-    nome_socio: String,
-    qualificacao_socio: String,
-    tipo_socio: String
-}
-interface CompanyData {
-    cnpj: String,
-    razao_social: String,
-    uf: String,
-    qsa:BusinessPartnerData[]
-}
-
 class CompanyController {  
 
-    public async getCompany (req:Request, res:Response): Promise<CompanyData> {
+    public async getCompany (req:Request, res:Response): Promise<Response> {
         const cnpj: String = req.query.cnpj.toString()
         const consulta: String = req.query.consulta.toString()
         const brasilIoController = new BrasilIoController()
+        let statusCode: number = 200
         let company:ICompany
 
-        if (consulta == 'cacheado') {
-            company = await CompanyService.find(cnpj) 
+        try {
+            if (!consulta) 
+                return res.status(404).send('Tipo de consulta não informada.')
+            if (!cnpj) 
+                return res.status(404).send('CNPJ não informado.')
 
-            if (company.cnpj == undefined) {
+            if (consulta == 'cacheado') {
+
+                company = await CompanyService.find(cnpj)   
+
+                if (!company) {                    
+                    company = await brasilIoController.getCompany(cnpj)                
+                    statusCode = await CompanyService.create(company)
+                }    
+            }
+            else if (consulta == 'tempo_real') {
+
                 company = await brasilIoController.getCompany(cnpj)
-                CompanyService.findAndUpdate(cnpj,company)
-            }            
-        }
-        else {
-            company = await brasilIoController.getCompany(cnpj)
-            CompanyService.findAndUpdate(cnpj,company)
-        }
 
-        res.send(company)
-        return company
+                if (await CompanyService.exists(cnpj)) 
+                    statusCode = await CompanyService.update(cnpj,company)
+                else 
+                    statusCode = await CompanyService.create(company)
+            }
+            else return res.status(400).send('Tipo de consulta inválido.')
+
+            return res.status(statusCode).send(company.toJSON()) 
+        } 
+        catch (error) {
+            return res.status(400).send({ error: error.message })
+        }  
     }
 }
 

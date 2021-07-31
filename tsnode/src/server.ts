@@ -1,3 +1,4 @@
 import app from "./app"
+import config from './env/config'
 
-app.listen(3333)
+app.listen(config.port)

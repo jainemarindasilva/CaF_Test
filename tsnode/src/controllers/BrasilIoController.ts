@@ -1,4 +1,4 @@
-import { BrasilIoService } from './../services/BrasilIoService';
+import { BrasilIoService } from '../services/BrasilIoService';
 import { ICompany } from '../interfaces/CompanyInterface'
 import { IPartner } from '../interfaces/PartnerInterface'
 import Company from '../models/CompanyModel'

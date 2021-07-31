@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import routes from './routes/routes'
+import config from './env/configs'
 
 class App {
     public express: express.Application
@@ -20,9 +21,13 @@ class App {
     }
 
     private database(): void {
-        mongoose.connect('mongodb://localhost:27017/CaF_db', {
-            useNewUrlParser: true
-        })
+        mongoose.connect(
+            config.dbUri, 
+            {
+                useUnifiedTopology: true,
+                useNewUrlParser: true,
+                useFindAndModify: false
+            })
     }
 
     private routes (): void {
