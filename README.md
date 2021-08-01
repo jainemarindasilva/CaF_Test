@@ -23,14 +23,14 @@ Além disso, será necessário criar uma conta no site [Brasil.io](https://brasi
 #### 🎲 Rodando o projeto
 ```bash
 # Clone este repositório
-$ git clone git@github.com:tgmarinho/README-ecoleta.git
+$ git clone jainemarindasilva/CaF_Test
 
 # Editar o arquivo 'config.ts' disponível na pasta 'src/env' mudando as seguintes variáveis:
 'brasilIoToken' = seu token de acesso ao serviço BrasilIo
 'dbUri' = sua string de conexão com o banco de dados NOSQ
 
 # Acesse a pasta do projeto no terminal/cmd
-$ cd README-ecoleta
+$ cd tsnode
 
 # Instale as dependências
 $ npm install
@@ -41,8 +41,13 @@ $ npm run dev
 # O servidor inciará na porta:3333 - acesse http://localhost:3333 
 Para fazer uma consulta informe o cnpj da empresa que se deseja consultar juntamente com o tipo de consulta (cacheado ou tempo_real) no endpoint /companies.
 # Ex.: http://localhost:3333/companies?cnpj=055498000162&consulta=cacheado
+```
+[![Run in Insomnia}](https://insomnia.rest/images/run.svg)](https://insomnia.rest/run/?label=GetCompany&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjainemarindasilva%2FCaF_Test%2Fmain%2FInsomnia_CAF.json%3Ftoken%3DAMRY4H3GR6BW24MPI4ICHFTBA2ODQ)
 
-O microsserviço ira retornar um status code de 200 com o formato em JSON.
+
+#### 🎲 Retorno
+O microsserviço irá retornar um status code de 200 com o formato em JSON, como no exemplo:
+```bash
 {
   "cnpj": "34102645000238",
   "razao_social": "COMBATEAFRAUDE TECNOLOGIA DA INFORMACAO LTDA",
@@ -76,7 +81,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 -   **[mongoDb](https://www.mongodb.com/pt-br)**
 
 #### [](https://github.com/tgmarinho/Ecoleta#utilit%C3%A1rios)**Utilitários**
--   API:  **[IBGE API](https://servicodados.ibge.gov.br/api/docs/localidades?versao=1)** 
--   Editor:  **[Visual Studio Code](https://code.visualstudio.com/)**  → Extensions:  **[SQLite](https://marketplace.visualstudio.com/items?itemName=alexcvzz.vscode-sqlite)**
+-   API:  **[BRASILIO API](https://brasil.io/home/)** 
+-   Editor:  **[Visual Studio Code](https://code.visualstudio.com/)**
 -   Commit Conventional:  **[Commitlint](https://github.com/conventional-changelog/commitlint)**
 -   Teste de API:  **[Insomnia](https://insomnia.rest/)**
