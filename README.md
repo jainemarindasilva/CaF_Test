@@ -42,7 +42,7 @@ $ npm run dev
 Para fazer uma consulta informe o cnpj da empresa que se deseja consultar juntamente com o tipo de consulta (cacheado ou tempo_real) no endpoint /companies.
 # Ex.: http://localhost:3333/companies?cnpj=055498000162&consulta=cacheado
 ```
-[![Run in Insomnia}](https://insomnia.rest/images/run.svg)](https://insomnia.rest/run/?label=GetCompany&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjainemarindasilva%2FCaF_Test%2Fmain%2FInsomnia_CAF.json%3Ftoken%3DAMRY4H3GR6BW24MPI4ICHFTBA2ODQ)
+[![Run in Insomnia}](https://insomnia.rest/images/run.svg)](https://insomnia.rest/run/?label=&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjainemarindasilva%2FCaF_Test%2Fmain%2FInsomniaCaf.json%3Ftoken%3DAMRY4HY44OJSV5R5JSD3QMTBA2SG6)
 
 
 #### 🎲 Retorno
